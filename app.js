@@ -1,27 +1,30 @@
-//jshint esversion:6
+// Dependencies //
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
 
-
+// Running the App //
 const app = express();
 
+// Setting up "EJS", "Body-Parser", "Express-Static Folder" respectively. //
 app.set('view engine', 'ejs');
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
+// Connecting to MongoDB Atlas //
 mongoose.connect("mongodb+srv://admin-yash:moradabad@cluster0-6uq7s.mongodb.net/todolistDB", {useNewUrlParser: true});
 
 
+// Mongoose Schema and Model //
 const itemsSchema = {
   name: String
 };
 
 const Item = mongoose.model("Item", itemsSchema);
 
+// Default Items //
 const item1 = new Item({
   name: "Welcome to your todolist!"
 });
@@ -34,9 +37,9 @@ const item3 = new Item({
   name: "<-- Hit this to delete an item."
 });
 
-
 const defautItems = [item1, item2, item3];
 
+// For creating different Lists //
 const listSchema = {
   name: String,
   items: [itemsSchema]
@@ -44,7 +47,7 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
-
+// Get Request for the home route //
 
 app.get("/", function(req, res) {
 
@@ -65,6 +68,8 @@ app.get("/", function(req, res) {
   });
 
 });
+
+// Get Request for custom express routes //
 
 app.get("/:customListName", function(req,res){
   const customListName = _.capitalize(req.params.customListName);
@@ -89,6 +94,8 @@ app.get("/:customListName", function(req,res){
 
 }); 
 
+// Post Request for home route //
+
 app.post("/", function(req, res){
 
   const itemName = req.body.newItem;
@@ -112,6 +119,8 @@ app.post("/", function(req, res){
 
 });
 
+// Post Request for Deleting list items //
+
 app.post("/delete", function(req, res){
   const checkedItemId = req.body.checkbox;
   const listName = req.body.listName;
@@ -130,14 +139,9 @@ app.post("/delete", function(req, res){
       }
     });
   }
-
-
 });
 
-app.get("/about", function(req, res){
-  res.render("about");
-});
-
+// Ports Setup for app to listen //
 let port = process.env.PORT;
 if (port == null || port == "") {
   port = 3000;
